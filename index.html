@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>exteraClicker</title>
+<link rel="icon" href="assets/icon.png">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  :root{
+    --primary: #E83030;
+    --primary-2: #ff5446;
+    --muted: rgba(255,255,255,0.82);
+    --nav-height: 72px;
+    --btn-radius: 10px;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;background:linear-gradient(160deg,#8f1111 0%,var(--primary)40%,var(--primary-2)80%);color:#fff;user-select:none;padding-bottom:calc(var(--nav-height)+48px);overflow:auto}
+  .app{width:100%;max-width:980px;margin:18px auto;border-radius:16px;background:linear-gradient(180deg,rgba(0,0,0,0.18),rgba(0,0,0,0.10));box-shadow:0 12px 48px rgba(0,0,0,0.45);overflow:visible}
+  .top{padding:14px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(0,0,0,0.12),rgba(0,0,0,0.06));position:sticky;top:0;z-index:30;border-bottom-left-radius:14px;border-bottom-right-radius:14px;margin-top:0}
+  .brand{display:flex;gap:10px;align-items:center}
+  .brand img{width:40px;height:40px;border-radius:8px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.4)}
+  .brand .title{font-weight:800;font-size:1.05rem}
+  .right-top{display:flex;align-items:center;gap:10px}
+  .click-per{display:flex;align-items:center;gap:8px;font-weight:800;color:#fff;margin-left:10px}
+  .click-per img{width:22px;height:22px}
+
+  .main{padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .coin-row{display:flex;align-items:center;gap:10px;font-size:1.6rem;font-weight:800;color:#fff;text-shadow:0 6px 20px rgba(0,0,0,0.4)}
+  .coin-row img{width:36px;height:36px}
+
+  .target-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:100%;padding:18px 0;min-height:260px}
+  .target-ring{position:absolute;width:clamp(210px,44vw,360px);height:clamp(210px,44vw,360px);border-radius:50%;z-index:0;background:radial-gradient(circle at 40% 35%,rgba(255,255,255,0.06) 0%,rgba(232,48,48,0.08) 35%,rgba(232,48,48,0.12) 60%,rgba(0,0,0,0.35) 100%);box-shadow:inset 0 -18px 40px rgba(255,255,255,0.02),0 16px 40px rgba(0,0,0,0.6);left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+  #clickTarget{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(180px,40vw,320px);height:clamp(180px,40vw,320px);border-radius:50%;object-fit:cover;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 18px 60px rgba(0,0,0,0.6);transition:transform .12s ease,filter .12s ease;z-index:2;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,0.03),transparent 30%)}
+  #clickTarget.hit{transform:translate(-50%,-50%) scale(0.94);filter:drop-shadow(0 8px 30px rgba(232,48,48,0.14))}
+  .ripple{position:absolute;width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.18);pointer-events:none;transform:translate(-50%,-50%) scale(0.2);opacity:0.95;z-index:3;will-change:transform,opacity}
+  .float-text{position:absolute;font-weight:800;color:#fff;text-shadow:0 6px 18px rgba(0,0,0,0.5);pointer-events:none;z-index:4;will-change:transform,opacity}
+  .info-row{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px;max-width:760px;padding:0 14px;color:var(--muted);font-size:0.95rem}
+
+  .section{display:none;padding:14px 18px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02))}
+  .section.active{display:block}
+  .list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .list .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.06)}
+  .item .meta{display:flex;gap:10px;align-items:center}
+  .item img.icon{width:56px;height:56px;border-radius:8px;object-fit:cover}
+
+  .btn{appearance:none;-webkit-appearance:none;border:0;padding:10px 14px;border-radius:var(--btn-radius);font-weight:800;cursor:pointer;background:linear-gradient(90deg,var(--primary),var(--primary-2));color:#fff;box-shadow:0 8px 20px rgba(232,48,48,0.16);transition:transform .08s ease,box-shadow .12s ease,opacity .12s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(232,48,48,0.2)}
+  .btn:active{transform:translateY(0)}
+  .btn[disabled],.btn.disabled{opacity:0.42;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.ghost{background:rgba(255,255,255,0.06);color:var(--muted);box-shadow:none;font-weight:700}
+  #claimDaily.claimed{background:linear-gradient(90deg,rgba(120,120,120,0.4),rgba(90,90,90,0.4));color:rgba(255,255,255,0.8);box-shadow:none}
+
+  .modal-backdrop{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.28);z-index:12000;backdrop-filter:blur(6px) saturate(110%)}
+  .modal{min-width:260px;max-width:92%;padding:18px;border-radius:12px;color:#fff;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);box-shadow:0 14px 40px rgba(0,0,0,0.6);backdrop-filter:blur(8px) saturate(120%)}
+  .modal .ok{margin-top:12px;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--primary),var(--primary-2));border:0;color:#fff;font-weight:700}
+
+  .bottom-nav{position:fixed;left:0;right:0;bottom:8px;display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:auto}
+  .nav-inner{width:min(920px,calc(100% - 36px));height:var(--nav-height);background:linear-gradient(90deg,rgba(0,0,0,0.12),rgba(0,0,0,0.06));border-radius:14px;display:flex;gap:8px;align-items:center;justify-content:space-around;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,0.35);backdrop-filter:blur(6px)}
+  .nav-btn{flex:1;height:100%;display:flex;gap:8px;align-items:center;justify-content:center;flex-direction:column;color:var(--muted);font-weight:700;border-radius:10px;background:transparent;border:0;cursor:pointer}
+  .nav-btn.active{background:linear-gradient(90deg,var(--primary),var(--primary-2));color:#fff;box-shadow:0 8px 24px rgba(232,48,48,0.18)}
+
+  @media (max-width:740px){.top{flex-direction:column;gap:8px;align-items:stretch;padding:12px}.main{padding:14px 12px}.target-wrap{min-height:220px}.right-top{align-self:flex-end}}
+  @media (max-width:420px){#clickTarget{width:clamp(120px,48vw,220px);height:clamp(120px,48vw,220px)}.item img.icon{width:46px;height:46px}}
+</style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="exteraClicker">
+    <div class="top" id="topBar">
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div class="brand">
+          <img src="assets/icon.png" alt="icon" onerror="this.style.display='none'">
+          <div>
+            <div class="title">exteraClicker</div>
+            <div style="font-size:12px;color:var(--muted)">Тематический кликер под exteraGram</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-top" id="rightTop">
+        <div class="click-per" title="Коинов за клик">
+          <img src="assets/coin.png" alt="coin">
+          <div id="clickGain">+0</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="mainSection" class="main">
+      <div class="coin-row">
+        <img src="assets/coin.png" alt="coin">
+        <div id="scoreValue">0</div>
+      </div>
+
+      <div class="target-wrap" id="targetWrap">
+        <div class="target-ring" id="targetRing" aria-hidden="true"></div>
+        <img id="clickTarget" src="assets/skins/exteraMen-0.png" alt="Target" draggable="false" role="button" aria-label="Цель для клика">
+      </div>
+
+      <div class="info-row">
+        <div id="autoText">Авто: <span id="autoValue">0</span>/сек</div>
+        <div>COMBO x<span id="comboValue">1</span></div>
+        <div><button id="claimDaily" class="btn">Ежедневная награда</button></div>
+      </div>
+    </div>
+
+    <div id="shopSection" class="section" aria-hidden="true">
+      <h3 style="margin:8px 0 6px 0;">Магазин — майнеры</h3>
+      <div class="list" id="minersShop"></div>
+      <h4 style="margin-top:12px;">Скины</h4>
+      <div class="list" id="skinsShop"></div>
+    </div>
+
+    <div id="upgradesSection" class="section" aria-hidden="true">
+      <h3 style="margin:8px 0 6px 0;">Прокачка купленных майнеров</h3>
+      <div class="list" id="minersUpgradeList"></div>
+
+      <h4 style="margin-top:12px;">Сила клика</h4>
+      <div class="list">
+        <div class="item">
+          <div>Уровень <span id="clickPowerLevel">0</span></div>
+          <div><button id="upgradeClickPower" class="btn">Улучшить • <span id="upgradeClickCost">—</span></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" role="navigation" aria-label="Навигация">
+    <div class="nav-inner" role="tablist">
+      <button class="nav-btn active" data-target="main" id="navMain" aria-selected="true"><span class="material-icons">home</span>Главная</button>
+      <button class="nav-btn" data-target="shop" id="navShop" aria-selected="false"><span class="material-icons">storefront</span>Магазин</button>
+      <button class="nav-btn" data-target="upgrades" id="navUpgrades" aria-selected="false"><span class="material-icons">trending_up</span>Прокачка</button>
+    </div>
+  </nav>
+
+  <div id="modalRoot" style="display:none;"></div>
+
+<script>
+/* ---------- PERSISTED STATE ---------- */
+const KEY = 'exteraclicker_state_v3';
+
+const defaultState = {
+  score: 0,
+  clickPowerLevel: 0,
+  clickPowerBase: 1,
+  combo: 1,
+  // miners remain hardcoded here (per your previous structure)
+  availableMiners: [
+    { id:'webdev', name:'Веб-разработчик', cost:5000, baseIncome:5, img:'assets/miners/webdev.png', owned:false, level:0 },
+    { id:'gpus', name:'GPU-майнер', cost:150000, baseIncome:30, img:'assets/miners/gpu.png', owned:false, level:0 },
+    { id:'wind', name:'Ветряк', cost:500000, baseIncome:100, img:'assets/miners/windmill.png', owned:false, level:0 },
+    { id:'serverfarm', name:'Серверная ферма', cost:1500000, baseIncome:300, img:'assets/miners/serverfarm.png', owned:false, level:0 },
+    { id:'ai', name:'AI-кластер', cost:3000000, baseIncome:750, img:'assets/miners/ai.png', owned:false, level:0 },
+    { id:'oil', name:'Нефтяная вышка', cost:10000000, baseIncome:1000, img:'assets/miners/oilrig.png', owned:false, level:0 }
+  ],
+  // ONLY the initial skin is hardcoded — все остальные будут подхватываться из assets/skins/skins.txt
+  skins: [
+    { id:'exteraMen-0', name:'exteraMen', price:0, path:'assets/skins/exteraMen-0.png', owned:true }
+  ],
+  activeSkinId: 'exteraMen-0',
+  lastDaily: null
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return JSON.parse(JSON.stringify(defaultState));
+    const parsed = JSON.parse(raw);
+    // merge to keep new default fields if needed
+    const merged = Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
+    // ensure skins at least contains initial if parsed removed it
+    if(!Array.isArray(merged.skins) || !merged.skins.find(s=>s.id==='exteraMen-0')){
+      merged.skins = [{ id:'exteraMen-0', name:'exteraMen', price:0, path:'assets/skins/exteraMen-0.png', owned:true }].concat(merged.skins || []);
+    }
+    return merged;
+  }catch(e){
+    console.warn('loadState error', e);
+    return JSON.parse(JSON.stringify(defaultState));
+  }
+}
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ console.warn('saveState failed', e); } }
+let state = loadState();
+
+/* ---------- UI REFS ---------- */
+const scoreValueEl = document.getElementById('scoreValue');
+const clickGainEl = document.getElementById('clickGain');
+const autoValueEl = document.getElementById('autoValue');
+const comboValueEl = document.getElementById('comboValue');
+const clickTarget = document.getElementById('clickTarget');
+const targetWrap = document.getElementById('targetWrap');
+const targetRing = document.getElementById('targetRing');
+
+const minersShop = document.getElementById('minersShop');
+const skinsShop = document.getElementById('skinsShop');
+const minersUpgradeList = document.getElementById('minersUpgradeList');
+
+const navButtons = document.querySelectorAll('.nav-btn');
+const mainSection = document.getElementById('mainSection');
+const shopSection = document.getElementById('shopSection');
+const upgradesSection = document.getElementById('upgradesSection');
+
+const upgradeClickBtn = document.getElementById('upgradeClickPower');
+const upgradeClickCostEl = document.getElementById('upgradeClickCost');
+const clickPowerLevelEl = document.getElementById('clickPowerLevel');
+
+const claimDailyBtn = document.getElementById('claimDaily');
+const modalRoot = document.getElementById('modalRoot');
+
+/* ---------- HELPERS / ECONOMY ---------- */
+function fmt(n){ return Number(n).toLocaleString('ru-RU'); }
+function minerUpgradeCost(miner){ return Math.floor(miner.cost * Math.pow(1.45, miner.level)); }
+function incomePerSec(miner){ return miner.owned ? miner.baseIncome * miner.level : 0; }
+function totalAuto(){ return state.availableMiners.reduce((s,m)=> s + incomePerSec(m), 0) * state.combo; }
+function clickPower(){ return state.clickPowerBase + state.clickPowerLevel; }
+function clickPowerUpgradeCost(){ return Math.floor(250 * Math.pow(2, state.clickPowerLevel)); }
+function skinById(id){ return state.skins.find(s=>s.id===id); }
+function canClaimDaily(){ if(!state.lastDaily) return true; const last=new Date(state.lastDaily); const now=new Date(); return now.toDateString() !== last.toDateString(); }
+
+/* ---------- SKIN PARSING (name-price.png) ---------- */
+function parseSkinFilename(filename){
+  const f = filename.split('/').pop().split('?')[0].split('#')[0].trim();
+  if(!f) return null;
+  const dotIdx = f.lastIndexOf('.');
+  const base = dotIdx >= 0 ? f.slice(0, dotIdx) : f;
+  const lastDash = base.lastIndexOf('-');
+  if (lastDash === -1){
+    const nameRaw = base;
+    const price = 0;
+    const name = nameRaw.replace(/_/g,' ').trim();
+    const id = base;
+    return { id, name, price, path: 'assets/skins/' + encodeURIComponent(f) };
+  }
+  const namePart = base.slice(0, lastDash).trim();
+  const pricePart = base.slice(lastDash+1).trim();
+  const priceNum = parseInt(pricePart.replace(/\D/g,''), 10);
+  const price = isNaN(priceNum) ? 0 : priceNum;
+  const name = namePart.replace(/_/g,' ').trim();
+  const id = base;
+  return { id, name, price, path: 'assets/skins/' + encodeURIComponent(f) };
+}
+
+/* ---------- Load skins from skins.txt (ONLY) ---------- */
+async function loadSkinsFromFile(){
+  // Attempt to fetch a plain text list: one filename per line
+  try{
+    const r = await fetch('assets/skins/skins.txt', { cache: 'no-store' });
+    if(!r.ok) throw new Error('no skins.txt');
+    const txt = await r.text();
+    const lines = txt.split(/\r?\n/).map(l=> l.trim()).filter(Boolean);
+    if(!lines.length) throw new Error('empty skins.txt');
+
+    // parse lines into skin objects
+    const parsed = [];
+    for(const ln of lines){
+      const s = parseSkinFilename(ln);
+      if(s) parsed.push(s);
+    }
+
+    // Merge parsed skins with existing state.skins to preserve ownership
+    const existingMap = new Map((state.skins || []).map(s=>[s.id, s]));
+    const merged = [];
+    // ensure initial skin first (keep its owned flag)
+    const initial = { id:'exteraMen-0', name:'exteraMen', price:0, path:'assets/skins/exteraMen-0.png', owned:true };
+    const exSaved = existingMap.get(initial.id);
+    if (exSaved) initial.owned = !!exSaved.owned;
+    merged.push(initial);
+
+    for(const s of parsed){
+      // skip if it's the initial (avoid duplicates)
+      if(s.id === initial.id) continue;
+      const ex = existingMap.get(s.id);
+      const owned = !!(ex && ex.owned) || s.price === 0;
+      merged.push(Object.assign({}, s, { owned }));
+    }
+
+    // also preserve any previously owned skins that are not listed? user requested: "убери все скины, которые не прописаны в skins.txt"
+    // so we DO NOT include skins not in skins.txt (except initial). That means owned skins not in file will be dropped.
+    state.skins = merged;
+
+    // ensure activeSkinId exists; if not, set to initial
+    if(!state.skins.find(x=>x.id === state.activeSkinId)){
+      state.activeSkinId = initial.id;
+    }
+
+    saveState();
+    return;
+  }catch(e){
+    // skins.txt not found or parse failed — keep only initial skin (and any saved initial)
+    state.skins = state.skins.filter(s=> s.id === 'exteraMen-0');
+    state.activeSkinId = 'exteraMen-0';
+    saveState();
+    return;
+  }
+}
+
+/* ---------- UI UPDATE ---------- */
+function updateUI(){
+  scoreValueEl.textContent = fmt(Math.floor(state.score));
+  if (clickGainEl) clickGainEl.textContent = `+${fmt(clickPower())}`;
+  // авто текст
+  const autoTextEl = document.getElementById('autoText');
+  if (autoTextEl) autoTextEl.innerHTML = `Авто: <span id="autoValue">${fmt(Math.floor(totalAuto()))}</span>/сек`;
+  clickPowerLevelEl && (clickPowerLevelEl.textContent = state.clickPowerLevel);
+  upgradeClickCostEl && (upgradeClickCostEl.textContent = fmt(clickPowerUpgradeCost()));
+
+  // miners shop
+  minersShop.innerHTML = '';
+  state.availableMiners.forEach(m=>{
+    const item = document.createElement('div'); item.className='item';
+    const left = document.createElement('div'); left.className='meta';
+    const img = document.createElement('img'); img.className='icon'; img.src = m.img; img.alt = m.name; img.onerror = ()=>{ img.style.filter='grayscale(1)'; img.style.opacity=.5; };
+    const info = document.createElement('div'); info.innerHTML = `<div style="font-weight:700">${m.name}</div><div style="font-size:13px;color:rgba(255,255,255,0.85)">Доход: ${fmt(m.baseIncome)}/сек • Цена: ${fmt(m.cost)}</div>`;
+    left.appendChild(img); left.appendChild(info);
+    const right = document.createElement('div');
+    if (m.owned){ right.innerHTML = `<button class="btn ghost" disabled>Куплен</button>`; }
+    else { const btn = document.createElement('button'); btn.className='btn buyMiner'; btn.dataset.id = m.id; btn.innerHTML = `Купить • ${fmt(m.cost)}`; if (state.score < m.cost) btn.disabled = true; right.appendChild(btn); }
+    item.appendChild(left); item.appendChild(right); minersShop.appendChild(item);
+  });
+
+  // skins shop — built from state.skins (initial always present)
+  skinsShop.innerHTML = '';
+  state.skins.forEach(s=>{
+    const d = document.createElement('div'); d.className='item';
+    d.innerHTML = `<div class="meta"><img class="icon" src="${s.path}" alt="${s.name}" onerror="this.style.filter='grayscale(1)';this.style.opacity=.5;">
+      <div><div style="font-weight:700">${s.name}${s.id===state.activeSkinId ? ' • Активен' : ''}</div><div style="font-size:13px;color:rgba(255,255,255,0.85)">Цена: ${fmt(s.price)}</div></div></div>
+      <div>${s.owned ? `<button class="btn ghost activateSkin" data-id="${s.id}">${s.id===state.activeSkinId ? 'Активен' : 'Активировать'}</button>` : `<button class="btn buySkin" data-id="${s.id}">Купить • ${fmt(s.price)}</button>`}</div>`;
+    skinsShop.appendChild(d);
+  });
+
+  // upgrades list
+  minersUpgradeList.innerHTML = '';
+  state.availableMiners.filter(m=> m.owned).forEach(m=>{
+    const d = document.createElement('div'); d.className='item';
+    d.innerHTML = `<div class="meta"><img class="icon" src="${m.img}" alt="${m.name}" onerror="this.style.filter='grayscale(1)';this.style.opacity=.5;">
+      <div><div style="font-weight:700">${m.name}</div><div style="font-size:13px;color:rgba(255,255,255,0.85)">Ур ${m.level} — Доход: ${fmt(m.baseIncome)}×ур = ${fmt(incomePerSec(m))}/сек</div></div></div>
+      <div><button class="btn upgradeMiner" data-id="${m.id}">Прокачать • ${fmt(minerUpgradeCost(m))}</button></div>`;
+    minersUpgradeList.appendChild(d);
+  });
+
+  // click power button
+  const c = clickPowerUpgradeCost();
+  if (upgradeClickBtn) { upgradeClickBtn.innerHTML = `Улучшить • ${fmt(c)}`; upgradeClickBtn.disabled = state.score < c; }
+
+  // daily button state
+  if (claimDailyBtn){
+    if (canClaimDaily()){ claimDailyBtn.classList.remove('claimed'); claimDailyBtn.disabled = false; } else { claimDailyBtn.classList.add('claimed'); claimDailyBtn.disabled = true; }
+  }
+
+  // enable/disable other buttons
+  document.querySelectorAll('.upgradeMiner').forEach(b=>{ const id=b.dataset.id; const m=state.availableMiners.find(x=>x.id===id); b.disabled = state.score < minerUpgradeCost(m); });
+  document.querySelectorAll('.buyMiner').forEach(b=>{ const id=b.dataset.id; const m=state.availableMiners.find(x=>x.id===id); b.disabled = m.owned || state.score < m.cost; });
+  document.querySelectorAll('.buySkin').forEach(b=>{ const id=b.dataset.id; const s=skinById(id); b.disabled = state.score < (s? s.price : Infinity); });
+  document.querySelectorAll('.activateSkin').forEach(b=>{ const id=b.dataset.id; b.disabled = id === state.activeSkinId; });
+
+  saveState();
+}
+
+/* ---------- Ring sizing ---------- */
+function adjustRingSize(){ requestAnimationFrame(()=>{ const rect = clickTarget.getBoundingClientRect(); const w = rect.width || clickTarget.offsetWidth || 220; const size = Math.round(w * 1.18); targetRing.style.width = size + 'px'; targetRing.style.height = size + 'px'; }); }
+window.addEventListener('resize', adjustRingSize);
+clickTarget.addEventListener('load', adjustRingSize);
+
+/* ---------- Click FX ---------- */
+function createClickEffects(clientX, clientY, amount){
+  const wrapRect = targetWrap.getBoundingClientRect();
+  const x = (clientX || (wrapRect.left + wrapRect.width/2)) - wrapRect.left;
+  const y = (clientY || (wrapRect.top + wrapRect.height/2)) - wrapRect.top;
+  const ripple = document.createElement('div'); ripple.className='ripple'; ripple.style.left = `${x}px`; ripple.style.top = `${y}px`; targetWrap.appendChild(ripple);
+  const maxDim = Math.max(wrapRect.width, wrapRect.height) * 1.2;
+  ripple.animate([{ transform:'translate(-50%,-50%) scale(0.2)', opacity:0.9 }, { transform:`translate(-50%,-50%) scale(${maxDim/16})`, opacity:0 }], { duration:600, easing:'cubic-bezier(.2,.8,.2,1)'});
+  setTimeout(()=> ripple.remove(), 650);
+  const float = document.createElement('div'); float.className='float-text'; float.textContent = `+${amount}`; float.style.left = `${x}px`; float.style.top = `${y}px`; targetWrap.appendChild(float);
+  const dir = Math.random() < 0.5 ? -1 : 1; const dx = 40 + Math.random()*30, dy = 60 + Math.random()*30;
+  float.animate([{ transform:'translate(-50%,-50%) translate(0,0)', opacity:1 }, { transform:`translate(-50%,-50%) translate(${dir*dx}px, -${dy}px)`, opacity:0 }], { duration:900, easing:'cubic-bezier(.2,.8,.2,1)'});
+  setTimeout(()=> float.remove(), 950);
+}
+
+/* ---------- Click handling ---------- */
+function givePoints(n){ state.score += Math.floor(n); updateUI(); saveState(); }
+function onTap(e){
+  let cx = e.clientX, cy = e.clientY;
+  if (!cx && e.touches && e.touches[0]) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+  clickTarget.classList.add('hit'); setTimeout(()=> clickTarget.classList.remove('hit'), 120);
+  const pts = clickPower();
+  givePoints(pts);
+  setStaticActiveSkin();
+  createClickEffects(cx, cy, pts);
+}
+if (window.PointerEvent){
+  clickTarget.addEventListener('pointerdown',(e)=>{ e.preventDefault?.(); onTap(e); },{passive:false});
+  clickTarget.addEventListener('contextmenu', e=> e.preventDefault());
+} else {
+  clickTarget.addEventListener('touchstart',(e)=>{ e.preventDefault(); onTap(e); },{passive:false});
+  clickTarget.addEventListener('click',(e)=> onTap(e));
+}
+targetWrap.addEventListener('pointerdown',(e)=>{ if(e.target===clickTarget) return; if(e.clientX && e.clientY){ const r=clickTarget.getBoundingClientRect(); if(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom) onTap(e); } });
+
+/* ---------- Actions (buy, upgrade, skins) ---------- */
+document.addEventListener('click',(e)=>{
+  const buyMinerBtn = e.target.closest('.buyMiner');
+  if(buyMinerBtn){ const id = buyMinerBtn.dataset.id; const m = state.availableMiners.find(x=>x.id===id); if(!m||m.owned) return; if(state.score>=m.cost){ state.score -= m.cost; m.owned = true; m.level = 1; updateUI(); saveState(); showSection('upgrades'); openModal('Успех', `Куплен майнер: ${m.name}`); } else openModal('Ошибка','Не хватает extera coin.'); return; }
+
+  const upgradeMinerBtn = e.target.closest('.upgradeMiner');
+  if(upgradeMinerBtn){ const id = upgradeMinerBtn.dataset.id; const m = state.availableMiners.find(x=>x.id===id); if(!m||!m.owned) return; const c = minerUpgradeCost(m); if(state.score>=c){ state.score -= c; m.level += 1; updateUI(); saveState(); } else openModal('Ошибка','Не хватает extera coin.'); return; }
+
+  const buySkinBtn = e.target.closest('.buySkin');
+  if(buySkinBtn){ const id = buySkinBtn.dataset.id; const s = skinById(id); if(!s) return; if(state.score>=s.price){ state.score -= s.price; s.owned = true; state.activeSkinId = s.id; setStaticActiveSkin(); updateUI(); saveState(); openModal('Куплено', `Скин "${s.name}" куплен и активирован.`); } else openModal('Ошибка','Не хватает extera coin.'); return; }
+
+  const actSkinBtn = e.target.closest('.activateSkin');
+  if(actSkinBtn){ const id = actSkinBtn.dataset.id; const s = skinById(id); if(!s||!s.owned) return; state.activeSkinId = s.id; setStaticActiveSkin(); updateUI(); saveState(); return; }
+});
+
+/* ---------- Daily reward & modal (frosted) ---------- */
+function openModal(title,text){
+  modalRoot.innerHTML=''; 
+  const backdrop = document.createElement('div'); backdrop.className='modal-backdrop';
+  const modal = document.createElement('div'); modal.className='modal';
+  modal.innerHTML = `<div style="font-weight:800;font-size:1.05rem;margin-bottom:6px">${title}</div><div>${text}</div>`;
+  const ok = document.createElement('button'); ok.className='ok'; ok.textContent='ОК';
+  ok.addEventListener('click', ()=> { modalRoot.style.display='none'; modalRoot.innerHTML=''; });
+  modal.appendChild(ok); backdrop.appendChild(modal); modalRoot.appendChild(backdrop); modalRoot.style.display='block';
+}
+
+claimDailyBtn.addEventListener('click', ()=>{
+  if(!canClaimDaily()){ openModal('Ежедневная награда','Награда уже получена сегодня.'); return; }
+  const reward = 1000 + Math.floor(Math.random()*2000);
+  state.score += reward; state.lastDaily = new Date().toISOString(); updateUI(); saveState();
+  openModal('Ежедневная награда', `Вы получили ${fmt(reward)} extera coin!`);
+});
+
+/* ---------- Upgrade click power ---------- */
+if(upgradeClickBtn) upgradeClickBtn.addEventListener('click', ()=>{
+  const c = clickPowerUpgradeCost();
+  if(state.score >= c){ state.score -= c; state.clickPowerLevel += 1; updateUI(); saveState(); } else openModal('Ошибка','Не хватает extera coin.');
+});
+
+/* ---------- Passive income ---------- */
+setInterval(()=>{ const per = Math.floor(totalAuto()); if(per>0){ state.score += per; updateUI(); saveState(); } },1000);
+
+/* ---------- Navigation ---------- */
+function showSection(name){
+  navButtons.forEach(b=>{ b.classList.toggle('active', b.dataset.target === name); b.setAttribute('aria-selected', b.dataset.target === name ? 'true' : 'false'); });
+  if(name==='main'){ mainSection.style.display='block'; shopSection.classList.remove('active'); shopSection.setAttribute('aria-hidden','true'); upgradesSection.classList.remove('active'); upgradesSection.setAttribute('aria-hidden','true'); }
+  else if(name==='shop'){ mainSection.style.display='none'; shopSection.classList.add('active'); shopSection.setAttribute('aria-hidden','false'); upgradesSection.classList.remove('active'); upgradesSection.setAttribute('aria-hidden','true'); }
+  else if(name==='upgrades'){ mainSection.style.display='none'; shopSection.classList.remove('active'); shopSection.setAttribute('aria-hidden','true'); upgradesSection.classList.add('active'); upgradesSection.setAttribute('aria-hidden','false'); }
+}
+navButtons.forEach(b=> b.addEventListener('click', ()=> showSection(b.dataset.target)));
+showSection('main');
+
+/* ---------- Set active skin image ---------- */
+function setStaticActiveSkin(){
+  const s = skinById(state.activeSkinId) || state.skins[0] || { path:'assets/skins/exteraMen-0.png', price:0 };
+  const img = new Image();
+  img.onload = ()=>{ clickTarget.src = s.path; adjustRingSize(); };
+  img.onerror = ()=>{ clickTarget.src = 'assets/skins/exteraMen-0.png'; adjustRingSize(); };
+  img.src = s.path;
+}
+
+/* ---------- Init ---------- */
+(async function init(){
+  if(state.score < 100) state.score += 100;
+  // load skins list from file (replaces any non-initial hardcoded skins)
+  await loadSkinsFromFile();
+  setStaticActiveSkin();
+  updateUI();
+  adjustRingSize();
+  setInterval(()=> saveState(),5000);
+  window.addEventListener('beforeunload', ()=> saveState());
+})();
+</script>
+</body>
+</html>
