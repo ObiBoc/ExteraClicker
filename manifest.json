@@ -1,11 +1,15 @@
 [
   {
     "relative_path": "index.html",
-    "sha": "2c0feb8917667836268296337d1707f4bb1e542c2241920599d197326adb86c3"
+    "sha": "f8381d8f03a23fe40f106faaac3a5dd0fc828bf0f2d87631f0e390bccf5cd8a8"
   },
   {
     "relative_path": "manifest_creator.sh",
     "sha": "ca0874c5952d0e07283f4e26592d1e8b74576aee1ceb891119e30a28c6861ead"
+  },
+  {
+    "relative_path": ".gitignore",
+    "sha": "5d22bbf0588709fe9808cc5ad2c28b033fdf99be8345555b27b04c4375e6374e"
   },
   {
     "relative_path": "assets/miners/windmill.png",
@@ -35,6 +39,39 @@
     "relative_path": "assets/skins/67-676767.png",
     "sha": "c28c03ef279f6d34f756fc914c54bd28c3f416f1ecf0591e5dcadd9709d4d9c1"
   },
+  {
+    "relative_path": "assets/skins/skins.txt",
+    "sha": "5fc76db0103bcf13f2cb479853179e8e278136f8610c05ae33c7f762eef71cea"
+  },
+  {
+    "relative_path": "assets/skins/extraFurry-11530.png",
+    "sha": "8ffefc7b5d24ecd94b0ca156afc87ee06ab90a0609cd24bcfefb2931272b7c12"
+  },
+  {
+    "relative_path": "assets/skins/exteraMen-0.png",
+    "sha": "7037a6c589a548ab491d8058c1e33302fda2fafc049cf705d32fc715c71445f2"
+  },
+  {
+    "relative_path": "assets/skins/жирноГрам-99999.jpg",
+    "sha": "4693392002a3225cb53fafa3b913a0d0a89280b4ef9465839cf364bcde475f54"
+  },
+  {
+    "relative_path": "assets/skins/По_химии_задали-1000.png",
+    "sha": "152a0850b5fe649fec0c191a4bf214963570f6ef46e4e6f4e1761243262c7020"
+  },
+  {
+    "relative_path": "assets/skins/Все_дороги_ведут_в_exteraGram-1375.jpg",
+    "sha": "f108b31a087c7c413d65513d8bfb1c88d0d025627985aca59fed7a6365e6503c"
+  },
+  {
+    "relative_path": "assets/coin.png",
+    "sha": "1a29ab800ea0b5fa75353be52168bcbd8b4f8ce2a8909d2c07d18c4d688af710"
+  },
+  {
+    "relative_path": "assets/icon.png",
+    "sha": "43ba1ae3228f80bdd782186e6ff32b95903af9f05314edeea1b435483e5509d2"
+  }
+]  },
   {
     "relative_path": "assets/skins/skins.txt",
     "sha": "5fc76db0103bcf13f2cb479853179e8e278136f8610c05ae33c7f762eef71cea"
