@@ -73,6 +73,43 @@
   }
 ]  },
   {
+    "relative_path": "assets/skins/67-676767.png",
+    "sha": "c28c03ef279f6d34f756fc914c54bd28c3f416f1ecf0591e5dcadd9709d4d9c1"
+  },
+  {
+    "relative_path": "assets/skins/skins.txt",
+    "sha": "5fc76db0103bcf13f2cb479853179e8e278136f8610c05ae33c7f762eef71cea"
+  },
+  {
+    "relative_path": "assets/skins/extraFurry-11530.png",
+    "sha": "8ffefc7b5d24ecd94b0ca156afc87ee06ab90a0609cd24bcfefb2931272b7c12"
+  },
+  {
+    "relative_path": "assets/skins/exteraMen-0.png",
+    "sha": "7037a6c589a548ab491d8058c1e33302fda2fafc049cf705d32fc715c71445f2"
+  },
+  {
+    "relative_path": "assets/skins/жирноГрам-99999.jpg",
+    "sha": "4693392002a3225cb53fafa3b913a0d0a89280b4ef9465839cf364bcde475f54"
+  },
+  {
+    "relative_path": "assets/skins/По_химии_задали-1000.png",
+    "sha": "152a0850b5fe649fec0c191a4bf214963570f6ef46e4e6f4e1761243262c7020"
+  },
+  {
+    "relative_path": "assets/skins/Все_дороги_ведут_в_exteraGram-1375.jpg",
+    "sha": "f108b31a087c7c413d65513d8bfb1c88d0d025627985aca59fed7a6365e6503c"
+  },
+  {
+    "relative_path": "assets/coin.png",
+    "sha": "1a29ab800ea0b5fa75353be52168bcbd8b4f8ce2a8909d2c07d18c4d688af710"
+  },
+  {
+    "relative_path": "assets/icon.png",
+    "sha": "43ba1ae3228f80bdd782186e6ff32b95903af9f05314edeea1b435483e5509d2"
+  }
+]  },
+  {
     "relative_path": "assets/skins/skins.txt",
     "sha": "5fc76db0103bcf13f2cb479853179e8e278136f8610c05ae33c7f762eef71cea"
   },
